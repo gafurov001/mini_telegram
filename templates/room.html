@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+</head>
+<body>
+<h2>{{ user.name }}</h2>
+<div id="chat-box" style="border: 1px solid #ccc; width: 300px; height: 400px; overflow-y: scroll; padding: 10px;">
+    <!-- Messages will appear here -->
+</div>
+<input type="text" id="message-input" placeholder="Type your message" style="width: 300px;">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+    let ws;
+    const chatBox = document.getElementById('chat-box');
+    const messageInput = document.getElementById('message-input');
+    const userId = "{{ user.id }}"; // Buni kirgan foydalanuvchining ID si bilan almashtirish kerak
+
+    // WebSocketga ulanish
+    function connectWebSocket() {
+        ws = new WebSocket(`ws://localhost:8000/ws/chat/${userId}`);
+
+        ws.onopen = () => {
+            console.log('WebSocket connection opened');
+        };
+
+        // ws.onmessage = (event) => {
+        //     const data = JSON.parse(event.data);
+        //     displayMessage(`${data.user}: ${data.text}`);
+        // };
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            displayMessage(data.owner_id, data.text);  // Pass both owner and message text
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket connection closed. Reconnecting...');
+            setTimeout(connectWebSocket, 1000); // Qayta ulanishga harakat qilish
+        };
+
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const userId = "{{ user.id }}";  // Django'dan foydalanuvchi ID'sini olamiz
+        const chatBox = document.getElementById('chat-box');
+
+        try {
+            const response = await fetch(`/messenger/chat_history/${userId}`);  // API'ga GET so'rov
+            const messages = await response.json();
+
+            // Eski yozishmalarni chiqarish
+            const ownerId = "{{ owner.id }}";  // This should be dynamically set from the backend
+            const ownerName = "{{ owner.name }}";  // Similarly, dynamically set from backend
+            const userName = "{{ user.name }}";  // Similarly, dynamically set from backend
+
+            messages.forEach(message => {
+                // Check if the message's owner_id matches the current owner's ID
+                if (message.owner_id == ownerId) {
+                    displayMessage(`You`, `${message.text}`);
+                } else {
+                    displayMessage(`${userName}`, `${message.text}`);
+                }
+            });
+        } catch (error) {
+            console.error('Error loading chat history:', error);
+        }
+    });
+
+    // Xabarni yuborish
+    function sendMessage() {
+        const message = messageInput.value;
+        if (message && ws.readyState === WebSocket.OPEN) {
+            const data = {
+                text: message
+            };
+            ws.send(JSON.stringify(data));
+            displayMessage(`You`, message);
+            messageInput.value = ''; // Kiritish maydonini tozalash
+        }
+    }
+
+
+    // Xabarlarni chat qutisida ko'rsatish
+    // function displayMessage(message) {
+    //     const messageElement = document.createElement('p');
+    //     messageElement.textContent = message;
+    //     chatBox.appendChild(messageElement);
+    //     chatBox.scrollTop = chatBox.scrollHeight;
+    // }
+
+    function displayMessage(owner, message) {
+        const messageElement = document.createElement('p');
+
+        const ownerElement = document.createElement('span');
+        ownerElement.style.fontWeight = 'bold';  // Make the owner's name bold
+        ownerElement.textContent = `${owner}: `;
+
+        messageElement.appendChild(ownerElement);
+        messageElement.appendChild(document.createTextNode(message));
+
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // WebSocket ulanishini boshlash
+    connectWebSocket();
+</script>
+</body>
+</html>
