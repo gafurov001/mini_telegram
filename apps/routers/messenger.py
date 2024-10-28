@@ -1,9 +1,6 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
-from sqlalchemy.sql.selectable import and_
 from starlette.requests import Request
 
-from apps.models import db
 from apps.models.user import User, Message
 from apps.utils.authentication import get_current_user
 from config import templates
@@ -33,7 +30,6 @@ async def get_messenger(request: Request, id: int):
 
 
 @messenger_router.get("/chat_history/{user_id}")
-async def chat_history(request: Request, user_id: int, ):
+async def chat_history(request: Request, user_id: int):
     owner_id = request.session.get('user').get('id')
-    query = select(Message).where(Message.user_id.in_([user_id, owner_id]), Message.owner_id.in_([user_id, owner_id]))
-    return (await db.execute(query)).scalars().all()
+    return await Message.get_messages_by_user_and_owner(user_id=user_id, owner_id=owner_id)

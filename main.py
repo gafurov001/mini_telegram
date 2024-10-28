@@ -39,4 +39,4 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 
 @app.exception_handler(status.HTTP_401_UNAUTHORIZED)
 def auth_exception_handler(request: Request, exc):
-    return RedirectResponse(request.url_for('login_page'))
+    return RedirectResponse(request.url_for("user-login"))

@@ -4,7 +4,7 @@ from sqlalchemy import BigInteger, delete as sqlalchemy_delete, DateTime, update
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncAttrs
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.future import select
-from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column, selectinload
 
 from config import conf
 
@@ -86,6 +86,35 @@ class AbstractClass:
     @classmethod
     async def get_all(cls):
         return (await db.execute(select(cls))).scalars().all()
+
+    @classmethod
+    async def filter(cls, criteria, *, relationship=None, columns=None):
+        if columns:
+            query = select(*columns)
+        else:
+            query = select(cls)
+
+        query = query.where(criteria)
+
+        if relationship:
+            query = query.options(selectinload(relationship))
+        return (await db.execute(query)).scalars()
+
+    @classmethod
+    async def all(cls):
+        return (await db.execute(select(cls))).scalars()
+
+    @classmethod
+    async def get_messages_by_user_and_owner(cls, user_id: int, owner_id: int):
+        query = (
+            select(cls)
+            .where(
+                cls.user_id.in_([user_id, owner_id]),
+                cls.owner_id.in_([user_id, owner_id])
+            )
+        )
+        result = await db.execute(query)
+        return result.scalars().all()
 
 
 class BaseModel(Base, AbstractClass):

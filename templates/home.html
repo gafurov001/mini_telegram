@@ -98,24 +98,22 @@
                                 <div class="chat-user-panel">
                                     <div class="pb-3 d-flex flex-column navigation-mobile pagination-scrool chat-user-scroll">
                                         {% for i in users %}
-                                            {% if not i.id == user.id %}
-                                                <a href="{{ url_for('room-page', id=i.id) }}">
-                                                   <div class="chat-item d-flex pl-3 pr-0 pt-3 pb-3">
-                                                        <div class="w-100">
-                                                            <div class="d-flex pl-0"><img
-                                                                    class="rounded-circle shadow avatar-sm mr-3"
-                                                                    src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png">
-                                                                <div><p class="margin-auto fw-400 text-dark-75"><a href="{{ url_for('room-page', id=i.id) }}">{{ i.name }}</a></p>
-                                                                    <div class="d-flex flex-row mt-1"><span><div
-                                                                            class="svg15 single-check"></div> </span> <span
-                                                                            class="message-shortcut margin-auto text-muted fs-13 ml-1 mr-4">No that's everyhing, thanks again! </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                        {% if not i.id == user.id %}
+                                        <a href="{{ url_for('room-page', id=i.id) }}">
+                                            <div class="chat-item d-flex pl-3 pr-0 pt-3 pb-3">
+                                                <div class="w-100">
+                                                    <div class="d-flex pl-0"><img
+                                                            class="rounded-circle shadow avatar-sm mr-3"
+                                                            src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png">
+                                                        <div><p class="margin-auto fw-400 text-dark-75"><a
+                                                                href="{{ url_for('room-page', id=i.id) }}">{{ i.name
+                                                            }}</a></p>
                                                         </div>
                                                     </div>
-                                                </a>
-                                            {% endif %}
+                                                </div>
+                                            </div>
+                                        </a>
+                                        {% endif %}
                                         {% endfor %}
                                     </div>
                                 </div>

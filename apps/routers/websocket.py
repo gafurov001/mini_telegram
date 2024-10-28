@@ -1,12 +1,8 @@
-from select import select
-
 from fastapi import APIRouter
-from sqlalchemy import Select
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
-from apps.models import db
 from apps.models.user import Message, User
-from apps.utils.bot import bot_send_message_if_user_offline
+from celery_config import send_msg_if_offline
 
 
 class ConnectionManager:
@@ -31,12 +27,9 @@ class ConnectionManager:
             name = websocket.session.get('user').get('name')
             msg = message.get('message')
             text = msg.get('text')
-            await bot_send_message_if_user_offline(name, text, tlg_id)
-            await Message.create(user_id=message.get('msg_recipient'), owner_id=websocket.session.get('user').get('id'), text=text)
-
-    # async def broadcast(self, message: str):
-    #     for connection in self.active_connections:
-    #         await connection.send_text(message)
+            send_msg_if_offline(name, text, tlg_id)
+            await Message.create(user_id=message.get('msg_recipient'), owner_id=websocket.session.get('user').get('id'),
+                                 text=text)
 
 
 manager = ConnectionManager()
@@ -52,6 +45,3 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
             await manager.send_message({"message": data, "msg_recipient": user_id}, websocket)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-
-
-
