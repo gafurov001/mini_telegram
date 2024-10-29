@@ -1,21 +1,18 @@
-import os
 from datetime import datetime, timezone, timedelta
-
-import jwt
-from dotenv import load_dotenv
-from fastapi import HTTPException
-from jwt import InvalidTokenError
 from typing import Union
 
+import jwt
+from fastapi import HTTPException
+from jwt import InvalidTokenError
 from starlette import status
 from starlette.authentication import AuthenticationBackend
 from starlette.requests import Request
 
 from apps.models.user import User
+from config import secret_key
 
 ALGORITHM = "HS256"
 
-load_dotenv()
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -31,13 +28,13 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, os.getenv('SECRET_KEY'), algorithm=ALGORITHM)
+    return jwt.encode(to_encode, secret_key, algorithm=ALGORITHM)
 
 
 async def get_current_user(request: Request) -> Union[User, None]:
     token = request.session.get("token")
     try:
-        payload = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms=[ALGORITHM])
+        payload = jwt.decode(token, secret_key, algorithms=[ALGORITHM])
         username: dict = payload.get("username")
         if username is None:
             raise credentials_exception

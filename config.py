@@ -46,3 +46,6 @@ class CustomFileSystemStorage(FileSystemStorage):
 conf = Configuration()
 storage = CustomFileSystemStorage
 templates = Jinja2Templates(directory='templates')
+redis = os.getenv('REDIS')
+secret_key = os.getenv('SECRET_KEY')
+bot_token = os.getenv('BOT_TOKEN')

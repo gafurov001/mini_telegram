@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import os
 import sys
 
 from aiogram import Bot, Dispatcher, html
@@ -8,14 +7,11 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
-from dotenv import load_dotenv
 
-load_dotenv()
-
-TOKEN = os.getenv("BOT_TOKEN")
+from config import bot_token
 
 dp = Dispatcher()
-bot = Bot(token=TOKEN)
+bot = Bot(token=bot_token)
 
 
 async def bot_send_message_if_user_offline(message_owner_name: str, text: str, user_tlg_id: int or str) -> None:
@@ -28,7 +24,7 @@ async def command_start_handler(message: Message) -> None:
 
 
 async def main() -> None:
-    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
     await dp.start_polling(bot)
 

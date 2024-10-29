@@ -1,7 +1,6 @@
 import os
 from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from starlette import status
 from starlette.middleware.cors import CORSMiddleware
@@ -11,11 +10,8 @@ from starlette.responses import RedirectResponse
 from starlette.staticfiles import StaticFiles
 
 from apps.models import db
-from apps.routers.messenger import messenger_router
-from apps.routers.users import user_router
-from apps.routers.websocket import websocket_router
-
-load_dotenv()
+from apps.routers import user_router, websocket_router, messenger_router
+from config import secret_key
 
 
 @asynccontextmanager
@@ -32,7 +28,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.add_middleware(SessionMiddleware, secret_key=os.getenv('SECRET_KEY'))
+app.add_middleware(SessionMiddleware, secret_key=secret_key)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
                    allow_headers=["*"])
 

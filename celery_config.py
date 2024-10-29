@@ -3,11 +3,12 @@ import asyncio
 from celery.app import Celery
 
 from apps.utils.bot import bot_send_message_if_user_offline
+from config import redis
 
 celery_app = Celery(
     "worker",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0"
+    broker=redis,
+    backend=redis
 )
 celery_app.conf.update(
     broker_connection_retry_on_startup=True
