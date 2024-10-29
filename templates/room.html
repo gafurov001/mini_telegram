@@ -21,7 +21,7 @@
 
     // WebSocketga ulanish
     function connectWebSocket() {
-        ws = new WebSocket(`ws://localhost:8000/ws/chat/${userId}`);
+        ws = new WebSocket(`ws://10.10.2.177:8000/ws/chat/${userId}`);
 
         ws.onopen = () => {
             console.log('WebSocket connection opened');
@@ -85,14 +85,6 @@
         }
     }
 
-
-    // Xabarlarni chat qutisida ko'rsatish
-    // function displayMessage(message) {
-    //     const messageElement = document.createElement('p');
-    //     messageElement.textContent = message;
-    //     chatBox.appendChild(messageElement);
-    //     chatBox.scrollTop = chatBox.scrollHeight;
-    // }
 
     function displayMessage(owner, message) {
         const messageElement = document.createElement('p');

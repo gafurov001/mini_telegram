@@ -20,9 +20,8 @@ class ConnectionManager:
         for connection in self.active_connections:
             user = connection.session.get('user')
             if user.get('id') == message.get('msg_recipient'):
-                msg = message.get('message')
-                text = msg.get('text')
-                await Message.create(user_id=message.get('msg_recipient'),
+                text = message.get('message').get('text')
+                await Message.create(user_id=user.get('id'),
                                      owner_id=websocket.session.get('user').get('id'),
                                      text=text)
                 return await connection.send_json({'owner_id': websocket.session.get('user').get('name'), 'text': text})
