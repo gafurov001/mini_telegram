@@ -25,7 +25,7 @@ class User(BaseModel):
 
 class Message(BaseModel):
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey(User.id, ondelete='CASCADE'))
-    owner_id: Mapped[int] = mapped_column(BigInteger, ForeignKey(User.id, ondelete='CASCADE'))
     text: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.datetime.now())
+    owner_id: Mapped[int] = mapped_column(BigInteger, ForeignKey(User.id, ondelete='CASCADE'))
     owner: Mapped['User'] = relationship('User', back_populates='messages', foreign_keys=[owner_id])
